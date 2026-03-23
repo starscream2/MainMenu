@@ -1,31 +1,21 @@
 import streamlit as st
 
-# --- PAGE CONFIG ---
 st.set_page_config(page_title="T&T Real Estate Portal", page_icon="🇹🇹")
 
-# --- CUSTOM CSS FOR BETTER BUTTONS ---
-st.markdown("""
-    <style>
-    .stButton>button {
-        width: 100%;
-        height: 3em;
-        font-size: 20px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 st.title("🇹🇹 T&T Real Estate Learning Portal")
-st.write("Welcome! Please choose how you would like to study today:")
+st.markdown("### Welcome! Choose your study mode below:")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("📝 Standard Practice Exam"):
+    st.subheader("Standard Mode")
+    if st.button("📝 Take Practice Exam"):
         st.switch_page("pages/exam.py")
 
 with col2:
-    if st.button("💰 Real Estate Tycoon Game"):
+    st.subheader("Tycoon Mode")
+    if st.button("💰 Play Tycoon Game"):
         st.switch_page("pages/game.py")
 
 st.divider()
-st.info("Both options cover the Real Estate Agents Act 2020, RPO, and AML/CFT regulations.")
+st.info("Both modes cover the Real Estate Agents Act 2020, RPO, and AML/CFT regulations.")
