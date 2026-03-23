@@ -1,10 +1,7 @@
 import streamlit as st
 import random
 
-# --- CONFIGURATION ---
-st.set_page_config(page_title="T&T Real Estate Tycoon", page_icon="💰")
-
-# --- DATA: THE QUESTIONS ---
+# --- DATA: THE 30 QUESTIONS ---
 QUESTIONS = [
     {"q": "Under the Real Property Act (RPA), what is the 'Curtain Principle'?", "a": "B", "options": ["A) The right to hide the owner's name.", "B) The register is the sole source of information; no need to look behind it.", "C) Taxes are hidden from the public.", "D) The deed is kept in a dark room."]},
     {"q": "What is 'Escheat' in T&T land law?", "a": "C", "options": ["A) Cheating on a land survey.", "B) A type of mortgage.", "C) Reversion of property to the State if there are no heirs.", "D) Building on someone else's land."]},
@@ -39,17 +36,17 @@ QUESTIONS = [
 ]
 
 # --- SESSION STATE ---
-if 'quiz_data' not in st.session_state:
-    st.session_state.quiz_data = random.sample(QUESTIONS, len(QUESTIONS))
-    st.session_state.submitted = False
+if 'game_data' not in st.session_state:
+    st.session_state.game_data = random.sample(QUESTIONS, len(QUESTIONS))
+    st.session_state.game_submitted = False
 
 # --- UI ---
-st.title("💰 T&T Real Estate Tycoon Challenge")
+st.title("💰 Real Estate Tycoon Challenge")
 st.markdown("### Close the deals and earn your commission!")
 
 with st.form("game_form"):
     user_answers = []
-    for i, item in enumerate(st.session_state.quiz_data):
+    for i, item in enumerate(st.session_state.game_data):
         st.markdown(f"**Deal #{i+1}:** {item['q']}")
         choice = st.radio("Choose your move:", item['options'], key=f"g{i}", index=None)
         user_answers.append(choice[0] if choice else None)
@@ -58,47 +55,36 @@ with st.form("game_form"):
     submitted = st.form_submit_button("Finalize All Deals")
 
 if submitted:
-    st.session_state.submitted = True
-    score = 0
-    incorrect_indices = []
+    st.session_state.game_submitted = True
+    score = sum(1 for i, item in enumerate(st.session_state.game_data) if user_answers[i] == item['a'])
+    percent = (score / len(st.session_state.game_data)) * 100
+    commission = score * 10000 
     
-    for i, item in enumerate(st.session_state.quiz_data):
-        if user_answers[i] == item['a']:
-            score += 1
-        else:
-            incorrect_indices.append(i)
-    
-    percent = (score / len(st.session_state.quiz_data)) * 100
-    commission = score * 10000 # $10,000 per right answer
-    
-    # Game Results Header
     st.header(f"Total Commission Earned: ${commission:,}")
-    st.progress(score / len(st.session_state.quiz_data))
+    st.progress(score / len(st.session_state.game_data))
 
-    # Rank Assignment
     if percent == 100:
-        st.success("🏆 RANK: MANAGING BROKER (CEO Status)")
+        st.success("🏆 RANK: MANAGING BROKER")
         st.balloons()
     elif percent >= 80:
         st.success("🏢 RANK: SENIOR NEGOTIATOR")
-        st.snow()
     elif percent >= 60:
         st.warning("💼 RANK: LICENSED AGENT")
     else:
         st.error("📎 RANK: REAL ESTATE INTERN")
 
-    # Incorrect Answer Review
+    # Review Section
+    incorrect_indices = [i for i, item in enumerate(st.session_state.game_data) if user_answers[i] != item['a']]
     if incorrect_indices:
-        with st.expander("📝 Review Failed Negotiations (Mistakes)"):
+        with st.expander("📝 Review Failed Negotiations"):
             for idx in incorrect_indices:
-                q_item = st.session_state.quiz_data[idx]
+                q_item = st.session_state.game_data[idx]
                 st.markdown(f"**Deal #{idx+1} Failed:** {q_item['q']}")
                 correct_text = next((opt for opt in q_item['options'] if opt.startswith(q_item['a'])), q_item['a'])
                 st.write(f"✅ **The Correct Move Was:** {correct_text}")
                 st.divider()
 
-if st.session_state.submitted:
-    if st.button("Start New Career (Restart)"):
-        st.session_state.quiz_data = random.sample(QUESTIONS, len(QUESTIONS))
-        st.session_state.submitted = False
-        st.rerun()
+if st.session_state.game_submitted:
+    if st.button("Start New Career"):
+        st.session_state.game_data = random.sample(QUESTIONS, len(QUESTIONS))
+        st.session_state.game_submitted = False
