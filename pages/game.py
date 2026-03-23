@@ -81,6 +81,7 @@ if submitted:
                 q_item = st.session_state.game_data[idx]
                 st.markdown(f"**Deal #{idx+1} Failed:** {q_item['q']}")
                 correct_text = next((opt for opt in q_item['options'] if opt.startswith(q_item['a'])), q_item['a'])
+                st.write(f"❌ **Your Answer:** {user_answers[idx] if user_answers[idx] else 'No answer provided'}")
                 st.write(f"✅ **The Correct Move Was:** {correct_text}")
                 st.divider()
 
@@ -88,3 +89,4 @@ if st.session_state.game_submitted:
     if st.button("Start New Career"):
         st.session_state.game_data = random.sample(QUESTIONS, len(QUESTIONS))
         st.session_state.game_submitted = False
+        st.rerun()
